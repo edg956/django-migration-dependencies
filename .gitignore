@@ -1,0 +1,11 @@
+# tests
+__pycache__
+
+# Distribution related
+dist/
+
+# MacOS
+.DS_Store
+
+# IDEs
+.idea

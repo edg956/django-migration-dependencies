@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "django-migration-dependencies"
+version = "0.1.0"
+description = "A Django app to visualise the migrations graph"
+authors = ["Eugenio Doñaque <eugenio@donaque.xyz>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/edg956/django-migration-dependencies"
+repository = "https://github.com/edg956/django-migration-dependencies"
+include = [
+    "LICENSE",
+]
+packages = [{include = "migrations_graph", from = "migrations_graph"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+Django = "3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
