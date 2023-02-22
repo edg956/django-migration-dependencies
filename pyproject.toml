@@ -10,7 +10,7 @@ repository = "https://github.com/edg956/django-migration-dependencies"
 include = [
     "LICENSE",
 ]
-packages = [{include = "migrations_graph", from = "migrations_graph"}]
+packages = [{include = "migrations_graph", from = "dmdg"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
