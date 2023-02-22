@@ -3,25 +3,12 @@
     <head>
         <meta charset="UTF-8">
         <title>Django Migration Dependencies Graph</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js" integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
     <body>
         <div id="container" style="height: 100vh; width: 100vw"></div>
         <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.23.0/dist/cytoscape.min.js"></script>
         <script type="text/javascript">
-            function randomColorGenerator(nColors) {
-                const colors = []
-                while (colors.length < nColors) {
-                    let color = Math.floor(Math.random() * (Math.pow(2, 24) - 1)).toString(16);
-                    if (color.length !== 6) {
-                        color = "0".repeat(6-color.length) + color
-                    }
-                    color = "#"+color
-                    if (colors.includes(color)) continue;
-                    colors.push(color);
-                }
-                return colors
-            }
-
             let nodes = [
             {% for node in nodes %}
                 {
@@ -43,13 +30,14 @@
 
             let apps = nodes.filter(n => !n.parent)
             let colorsByApp = {}
-            randomColorGenerator(apps.length).forEach((color, idx) => {
-                colorsByApp[apps[idx].name] = color;
+            apps.forEach(app => {
+                colorsByApp[app.name] = chroma.random().hex();
             })
 
             nodes = nodes.map(n => {
                 let app = n.type === 'app' ? n.name : n.parent
-                n.color = colorsByApp[app]
+                let color = colorsByApp[app]
+                n.color = n.type === 'app' ? color : chroma(color).darken().hex()
                 n.app = app
                 return n
             })
@@ -58,7 +46,7 @@
                 let sourceApp = n.source.split('-')[0];
                 let targetApp = n.target.split('-')[0];
                 if (sourceApp !== targetApp) {
-                    n.color = colorsByApp[sourceApp]
+                    n.color = chroma(colorsByApp[sourceApp]).darken().hex()
                 } else {
                     n.color = "gray"
                 }
