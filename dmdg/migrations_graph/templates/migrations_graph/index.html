@@ -58,13 +58,21 @@
             })
 
             cytoscape.use( cytoscapeDagre );
+            const layoutName = "{% if layout %}{{ layout }}{% endif %}" || "dagre";
+            const layoutFactory = (layout) => {
+                const options = {name: layout}
+                if (layout === "breadthfirst") {
+                    options['directed'] = true
+                }
+                return options
+            }
             const cy = cytoscape({
                 container: document.getElementById('container'),
                 elements: {
                     nodes: nodes.map(n => { return {data: n}}),
                     edges: edges.map(n => { return {data: n}})
                 },
-                layout: {name: "dagre"},
+                layout: layoutFactory(layoutName),
                 style: [
                     {selector: 'node', style: {label: 'data(name)', 'background-color': 'data(color)'}},
                     {selector: 'edge', style: {'line-color': 'data(color)'}}

@@ -29,13 +29,14 @@ def make_edge(migration_a: Migration, migration_b: Migration) -> Edge:
         source=migration_a.id,
         target=migration_b.id
     )
-    print(f"------ created edge: {edge.id}")
+
     return edge
 
 
 def index(request):
     include = request.GET.get('include', None)
     exclude = request.GET.get('exclude', "")
+    layout_name = request.GET.get('layout', 'dagre')
 
     loader = MigrationLoader(None)
 
@@ -99,4 +100,4 @@ def index(request):
         for edge in edges
     ]
 
-    return render(request, 'migrations_graph/index.html', {"nodes": nodes, "edges": edges})
+    return render(request, 'migrations_graph/index.html', {"nodes": nodes, "edges": edges, "layout": layout_name})
