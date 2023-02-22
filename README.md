@@ -1,6 +1,10 @@
 # Django Migration Dependency Graph
 This is an app that helps developers understand how their migrations are interconnected across their apps, serving as a tool to identify possible circular dependencies when squashing them.
 
+## Installation
+
+    pip install django-migration-dependencies
+
 ## Quick start
 
 1. Add "migrations-graph" to your INSTALLED_APPS setting like this:
