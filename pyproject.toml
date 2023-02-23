@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-migration-dependencies"
-version = "0.1.2"
+version = "0.1.3"
 description = "A Django app to visualise the migrations graph"
 authors = ["Eugenio Doñaque <eugenio@donaque.xyz>"]
 license = "MIT"
