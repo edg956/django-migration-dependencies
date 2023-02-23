@@ -17,8 +17,9 @@
                 {
                     id: "{{node.id}}",
                     name: "{{node.name}}",
-                    {% if node.parent %} parent: "{{node.parent}}", {% endif %}
-                    type: "{{node.type}}"
+                    type: "{{node.type}}",
+                    {% if node.parent %}parent: "{{node.parent}}",{% endif %}
+                    {% if node.runs_special %}runsSpecial: "{{ node.runs_special }}" === "True",{% endif %}
                 },
             {% endfor %}
             ]
@@ -69,12 +70,29 @@
             const cy = cytoscape({
                 container: document.getElementById('container'),
                 elements: {
-                    nodes: nodes.map(n => { return {data: n}}),
+                    nodes: nodes.map(n => {
+                        const node =  {data: n}
+                        if (n.runsSpecial) {
+                            node["style"] = {
+                                'background-image': "{{ special_icon }}",
+                                'background-fit': "cover",
+                                'background-offset-x': "1.5",
+                                'background-offset-y': "2.5",
+                            }
+                        }
+                        return node
+                    }),
                     edges: edges.map(n => { return {data: n}})
                 },
                 layout: layoutFactory(layoutName),
                 style: [
-                    {selector: 'node', style: {label: 'data(name)', 'background-color': 'data(color)'}},
+                    {
+                        selector: 'node',
+                        style: {
+                            label: 'data(name)',
+                            'background-color': 'data(color)',
+                        }
+                    },
                     {selector: 'edge', style: {'line-color': 'data(color)'}}
                 ]
             })

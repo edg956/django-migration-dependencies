@@ -1,21 +1,25 @@
 from collections import namedtuple
 
 from django.apps import apps
-from django.db.migrations.graph import Node
+from django.conf import settings
+from django.db.migrations.graph import Node, MigrationGraph
 from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.operations.special import SeparateDatabaseAndState, RunPython, RunSQL
 from django.shortcuts import render
 
 
-Migration = namedtuple("Migration", ("id", "name", "parent"))
+Migration = namedtuple("Migration", ("id", "name", "parent", "runs_special"))
 App = namedtuple("App", ("id", "name"))
 Edge = namedtuple("Edge", ("id", "source", "target"))
 
 
-def make_migration(node: Node) -> Migration:
+def make_migration(node: Node, graph: MigrationGraph) -> Migration:
+    mig = graph.nodes[node.key]
     return Migration(
         id=f"{node.key[0]}-{node.key[1]}",
         name=node.key[1],
-        parent=node.key[0]
+        parent=node.key[0],
+        runs_special=any(isinstance(op, (SeparateDatabaseAndState, RunSQL, RunPython)) for op in mig.operations)
     )
 
 
@@ -65,15 +69,14 @@ def index(request):
             if node in visited:
                 continue
 
-            migration = make_migration(node)
+            migration = make_migration(node, loader.graph)
 
             visited.add(node)
             migrations.add(migration)
             apps_set.add(make_app(node))
 
             for parent in node.parents:
-
-                parent_migration = make_migration(parent)
+                parent_migration = make_migration(parent, loader.graph)
 
                 migrations.add(parent_migration)
                 apps_set.add(make_app(parent))
@@ -91,7 +94,13 @@ def index(request):
         dict(id=app.id, name=app.name, type="app")
         for app in apps_set
     ] + [ # noqa
-        dict(id=migration.id, name=migration.name, parent=migration.parent, type="migration")
+        dict(
+            id=migration.id,
+            name=migration.name,
+            parent=migration.parent,
+            runs_special=migration.runs_special,
+            type="migration",
+        )
         for migration in migrations
     ]
 
@@ -100,4 +109,15 @@ def index(request):
         for edge in edges
     ]
 
-    return render(request, 'migrations_graph/index.html', {"nodes": nodes, "edges": edges, "layout": layout_name})
+    special_icon = getattr(
+        settings,
+        'MIGRATIONS_GRAPH_SPECIAL_ICON',
+        'https://raw.githubusercontent.com/edg956/django-migration-dependencies/main/public/img/python-logo.svg'
+    )
+
+    return render(request, 'migrations_graph/index.html', {
+        "nodes": nodes,
+        "edges": edges,
+        "layout": layout_name,
+        "special_icon": special_icon
+    })
