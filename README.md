@@ -12,7 +12,7 @@ This is an app that helps developers understand how their migrations are interco
 
     INSTALLED_APPS = [
         ...
-        'migrations-graph',
+        'migrations_graph',
     ]
 
 
